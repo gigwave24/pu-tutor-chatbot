@@ -696,8 +696,8 @@
                     <button class="chat-submit" title="Send message">➤</button>
                 </div>
                 <div class="chat-button-area">
-                    <button class="chat-voice-message-btn" title="Record voice message">🎙️</button>
-                    <button class="chat-stream-mode-btn" title="Start conversational AI">🤖</button>
+                    <button class="chat-voice-message-btn" title="Start voice chat with Pauline">🎙️</button>
+                    <button class="chat-stream-mode-btn" title="Make a voice call to Pauline">📞</button>
                 </div>
             </div>
             <div class="chat-footer">
@@ -827,7 +827,7 @@
         const lessonId = window.ChatWidgetConfig?.user?.lessonId || '4713';
 
         injectElevenLabsWidget(userId, userName, userEmail, lessonId);
-        alert('🗣️ Loading ElevenLabs conversational AI widget...');
+        alert('📞 Connecting you to Pauline...');
     });
 
     function sendVoiceMessage(audioBlob, metadata) {
