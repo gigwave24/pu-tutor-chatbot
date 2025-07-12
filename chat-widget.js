@@ -784,51 +784,53 @@
         }
     });
 
-    // Function to inject ElevenLabs widget
-    function injectElevenLabsWidget(userId, userName, userEmail, lessonId) {
-        if (document.querySelector('elevenlabs-convai')) {
-            console.log('✅ ElevenLabs widget already injected');
-            return;
-        }
-
-        const dynamicVars = {
-            user_id: userId || "1",
-            user_name: userName || "Guest",
-            user_email: userEmail || "guest@example.com",
-            lesson_id: lessonId || "4713"
-        };
-
-        console.log("✅ elevenlabsUserVars injected:", dynamicVars);
-
-        setTimeout(() => {
-            const convai = document.createElement("elevenlabs-convai");
-            convai.setAttribute("agent-id", "agent_01jzskys9xf2c9czr2j47tmp5y");
-            convai.setAttribute("dynamic-variables", JSON.stringify(dynamicVars));
-            document.body.appendChild(convai);
-
-            const script = document.createElement("script");
-            script.src = "https://unpkg.com/@elevenlabs/convai-widget-embed";
-            script.async = true;
-            script.type = "text/javascript";
-            script.onload = () => console.log('✅ ElevenLabs script loaded');
-            script.onerror = () => {
-                console.error('❌ Failed to load ElevenLabs script');
-                alert('⚠️ Failed to load conversational AI widget.');
-            };
-            document.body.appendChild(script);
-        }, 200);
+    // Function to inject ElevenLabs widget (agentId now passed in)
+function injectElevenLabsWidget(agentId, userId, userName, userEmail, lessonId) {
+    if (document.querySelector('elevenlabs-convai')) {
+        console.log('✅ ElevenLabs widget already injected');
+        return;
     }
 
-    // Stream mode button event listener (replaced with ElevenLabs widget)
-    streamModeBtn.addEventListener('click', () => {
-        const userId = window.ChatWidgetConfig?.user?.id || (emailInput ? emailInput.value.trim() : '');
-        const userName = window.ChatWidgetConfig?.user?.name || (nameInput ? nameInput.value.trim() : '');
-        const userEmail = window.ChatWidgetConfig?.user?.email || (emailInput ? emailInput.value.trim() : '');
-        const lessonId = window.ChatWidgetConfig?.user?.lessonId || '4713';
+    const dynamicVars = {
+        user_id: userId || "1",
+        user_name: userName || "Guest",
+        user_email: userEmail || "guest@example.com",
+        lesson_id: lessonId || "4713"
+    };
 
-        injectElevenLabsWidget(userId, userName, userEmail, lessonId);
-        alert('📞 Connecting you to Pauline...');
-    });
+    console.log("✅ elevenlabsUserVars injected:", dynamicVars);
+
+    setTimeout(() => {
+        const convai = document.createElement("elevenlabs-convai");
+        convai.setAttribute("agent-id", agentId); // passed in now
+        convai.setAttribute("dynamic-variables", JSON.stringify(dynamicVars));
+        document.body.appendChild(convai);
+
+        const script = document.createElement("script");
+        script.src = "https://unpkg.com/@elevenlabs/convai-widget-embed";
+        script.async = true;
+        script.type = "text/javascript";
+        script.onload = () => console.log('✅ ElevenLabs script loaded');
+        script.onerror = () => {
+            console.error('❌ Failed to load ElevenLabs script');
+            alert('⚠️ Failed to load Pauline.');
+        };
+        document.body.appendChild(script);
+    }, 200);
+}
+
+    streamModeBtn.addEventListener('click', () => {
+    const userId = window.ChatWidgetConfig?.user?.id || (emailInput ? emailInput.value.trim() : '');
+    const userName = window.ChatWidgetConfig?.user?.name || (nameInput ? nameInput.value.trim() : '');
+    const userEmail = window.ChatWidgetConfig?.user?.email || (emailInput ? emailInput.value.trim() : '');
+    const lessonId = window.ChatWidgetConfig?.user?.lessonId || '4713';
+
+    const agentId = window.ChatWidgetConfig?.agentId;
+    if (!agentId) return alert('Missing Pauline agent ID');
+
+    injectElevenLabsWidget(agentId, userId, userName, userEmail, lessonId);
+    alert('📞 Connecting you to Pauline...');
+});
 
     function sendVoiceMessage(audioBlob, metadata) {
         const formData = new FormData();
