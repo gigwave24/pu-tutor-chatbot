@@ -1160,7 +1160,7 @@
         
         isWaitingForResponse = true;
         
-        const userId = window.ChatWidgetConfig?.user?.id || (emailInput ? emailInput.value.trim() : '');
+        const userId = window.ChatWidgetConfig?.user?.id || "";
         const userName = window.ChatWidgetConfig?.user?.name || (nameInput ? nameInput.value.trim() : '');
         const userEmail = window.ChatWidgetConfig?.user?.email || (emailInput ? emailInput.value.trim() : '');
         const courseId = window.ChatWidgetConfig?.user?.courseId || '';
