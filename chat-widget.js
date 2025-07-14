@@ -948,7 +948,7 @@
     }
 
     // Function to inject ElevenLabs widget
-    function injectElevenLabsWidget(userId, userName, userEmail, lessonId) {
+    function injectElevenLabsWidget(agentid,userId, userName, userEmail, lessonId) {
         if (document.querySelector('elevenlabs-convai')) {
             console.log('✅ ElevenLabs widget already injected');
             return;
@@ -965,7 +965,7 @@
 
         setTimeout(() => {
             const convai = document.createElement("elevenlabs-convai");
-            convai.setAttribute("agent-id", "agent_01jzskys9xf2c9czr2j47tmp5y");
+            convai.setAttribute("agent-id", agentid);
             convai.setAttribute("dynamic-variables", JSON.stringify(dynamicVars));
             document.body.appendChild(convai);
 
@@ -989,7 +989,10 @@
         const userEmail = window.ChatWidgetConfig?.user?.email || (emailInput ? emailInput.value.trim() : '');
         const lessonId = window.ChatWidgetConfig?.user?.lessonId || '4713';
 
-        injectElevenLabsWidget(userId, userName, userEmail, lessonId);
+        const agentId = window.ChatWidgetConfig?.agentId;
+        if (!agentId) return alert('Missing Pauline agent ID');
+
+        injectElevenLabsWidget(agentId,userId, userName, userEmail, lessonId);
         alert('🗣️ Loading ElevenLabs conversational AI widget...');
     });
 
