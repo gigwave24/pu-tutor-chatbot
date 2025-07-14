@@ -1202,8 +1202,22 @@
                 body: JSON.stringify(requestData)
             });
             
-            const responseData = await response.json();
-            
+            if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+            let responseData;
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) 
+                {
+                    responseData = await response.json();
+                } 
+            else 
+                {
+                    responseData = { output: `Received non-JSON response: ${await response.text()}` };
+                    console.warn('Non-JSON response received:', await response.text());
+                }
+
             messagesContainer.removeChild(replyLoader);
             
             const botMessage = document.createElement('div');
@@ -1214,7 +1228,6 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         } catch (error) {
             console.error('Message submission error:', error);
-            
             messagesContainer.removeChild(replyLoader);
             
             const errorMessage = document.createElement('div');
