@@ -226,7 +226,51 @@
             border: 1px solid var(--chat-color-light);
         }
 
-        .chat-assist-widget .typing-indicator {
+        .chat-assist-widget .recording-loader {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, var(--chat-color-primary) 0%, var(--chat-color-secondary) 100%);
+            border-radius: var(--chat-radius-md);
+            border-bottom-right-radius: 4px;
+            max-width: 80px;
+            align-self: flex-end;
+            box-shadow: var(--chat-shadow-sm);
+            color: white;
+        }
+
+        .chat-assist-widget .recording-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: var(--chat-radius-full);
+            opacity: 0.7;
+            animation: recordingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .chat-assist-widget .recording-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .chat-assist-widget .recording-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .chat-assist-widget .recording-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes recordingAnimation {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-4px);
+            }
+        }
+
+        .chat-assist-widget .reply-loader {
             display: flex;
             align-items: center;
             gap: 4px;
@@ -240,28 +284,28 @@
             border: 1px solid var(--chat-color-light);
         }
 
-        .chat-assist-widget .typing-dot {
+        .chat-assist-widget .reply-dot {
             width: 8px;
             height: 8px;
             background: var(--chat-color-primary);
             border-radius: var(--chat-radius-full);
             opacity: 0.7;
-            animation: typingAnimation 1.4s infinite ease-in-out;
+            animation: replyAnimation 1.4s infinite ease-in-out;
         }
 
-        .chat-assist-widget .typing-dot:nth-child(1) {
+        .chat-assist-widget .reply-dot:nth-child(1) {
             animation-delay: 0s;
         }
 
-        .chat-assist-widget .typing-dot:nth-child(2) {
+        .chat-assist-widget .reply-dot:nth-child(2) {
             animation-delay: 0.2s;
         }
 
-        .chat-assist-widget .typing-dot:nth-child(3) {
+        .chat-assist-widget .reply-dot:nth-child(3) {
             animation-delay: 0.4s;
         }
 
-        @keyframes typingAnimation {
+        @keyframes replyAnimation {
             0%, 60%, 100% {
                 transform: translateY(0);
             }
@@ -588,50 +632,6 @@
         .chat-assist-widget .chat-stream-mode-btn:hover {
             background: var(--chat-color-light);
         }
-
-        .chat-assist-widget .recording-loader {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 14px 18px;
-    background: white;
-    border-radius: var(--chat-radius-md);
-    border-bottom-left-radius: 4px;
-    max-width: 80px;
-    align-self: flex-start;
-    box-shadow: var(--chat-shadow-sm);
-    border: 1px solid var(--chat-color-light);
-}
-
-.chat-assist-widget .recording-dot {
-    width: 8px;
-    height: 8px;
-    background: var(--chat-color-primary);
-    border-radius: var(--chat-radius-full);
-    opacity: 0.7;
-    animation: recordingAnimation 1.4s infinite ease-in-out;
-}
-
-.chat-assist-widget .recording-dot:nth-child(1) {
-    animation-delay: 0s;
-}
-
-.chat-assist-widget .recording-dot:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.chat-assist-widget .recording-dot:nth-child(3) {
-    animation-delay: 0.4s;
-}
-
-@keyframes recordingAnimation {
-    0%, 60%, 100% {
-        transform: translateY(0);
-    }
-    30% {
-        transform: translateY(-4px);
-    }
-}
     `;
     document.head.appendChild(widgetStyles);
 
@@ -740,8 +740,8 @@
                     <button class="chat-submit" title="Send message">➤</button>
                 </div>
                 <div class="chat-button-area">
-                    <button class="chat-voice-message-btn" title="Record voice message">🎙️</button>
-                    <button class="chat-stream-mode-btn" title="Start conversational AI">🤖</button>
+                    <button class="chat-voice-message-btn" title="Start voice chat with Pauline">🎙️</button>
+                    <button class="chat-stream-mode-btn" title="Make a voice call to Pauline">📞</button>
                 </div>
             </div>
             <div class="chat-footer">
@@ -778,151 +778,83 @@
     let mediaRecorder;
     let recordedChunks = [];
 
-// Voice message button event listener (updated to display recorded audio)
-voiceMessageBtn.addEventListener('click', async () => {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert('🎤 Microphone not supported in this browser.');
-        return;
-    }
+    // Voice message button event listener
+    voiceMessageBtn.addEventListener('click', async () => {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert('🎤 Microphone not supported in this browser.');
+            return;
+        }
 
-    try {
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-            voiceMessageBtn.innerHTML = '🎙️';
-            // Remove loader when recording stops
+        try {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                voiceMessageBtn.innerHTML = '🎙️';
+                const loader = messagesContainer.querySelector('.recording-loader');
+                if (loader) {
+                    messagesContainer.removeChild(loader);
+                }
+                alert('🎙️ Recording stopped.');
+                return;
+            }
+
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            recordedChunks = [];
+
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) recordedChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
+                const userId = window.ChatWidgetConfig?.user?.id || (emailInput ? emailInput.value.trim() : '');
+                const userName = window.ChatWidgetConfig?.user?.name || (nameInput ? nameInput.value.trim() : '');
+                const userEmail = window.ChatWidgetConfig?.user?.email || (emailInput ? emailInput.value.trim() : '');
+                const courseId = window.ChatWidgetConfig?.user?.courseId || '';
+                const lessonId = window.ChatWidgetConfig?.user?.lessonId || '';
+                sendVoiceMessage(audioBlob, {
+                    userId,
+                    userName,
+                    userEmail,
+                    courseId,
+                    lessonId
+                });
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            mediaRecorder.start();
+            voiceMessageBtn.innerHTML = '⏹️';
+
+            const loader = createRecordingLoader();
+            messagesContainer.appendChild(loader);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            alert('🎙️ Voice recording started. Click again to stop.');
+        } catch (err) {
+            alert('⚠️ Microphone access denied or failed.');
+            console.error(err);
             const loader = messagesContainer.querySelector('.recording-loader');
             if (loader) {
                 messagesContainer.removeChild(loader);
             }
-            alert('🎙️ Recording stopped.');
-            return;
         }
-
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        recordedChunks = [];
-
-        mediaRecorder = new MediaRecorder(stream);
-
-        mediaRecorder.ondataavailable = (e) => {
-            if (e.data.size > 0) recordedChunks.push(e.data);
-        };
-
-        mediaRecorder.onstop = () => {
-            const audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
-            const audioUrl = URL.createObjectURL(audioBlob);
-            displayRecordedAudio(audioUrl); // Display the recorded audio in the chat
-            const userId = window.ChatWidgetConfig?.user?.id || (emailInput ? emailInput.value.trim() : '');
-            const userName = window.ChatWidgetConfig?.user?.name || (nameInput ? nameInput.value.trim() : '');
-            const userEmail = window.ChatWidgetConfig?.user?.email || (emailInput ? emailInput.value.trim() : '');
-            const courseId = window.ChatWidgetConfig?.user?.courseId || '';
-            const lessonId = window.ChatWidgetConfig?.user?.lessonId || '';
-            sendVoiceMessage(audioBlob, {
-                userId,
-                userName,
-                userEmail,
-                courseId,
-                lessonId
-            });
-            stream.getTracks().forEach(track => track.stop());
-        };
-
-        mediaRecorder.start();
-        voiceMessageBtn.innerHTML = '⏹️';
-
-        // Add recording loader
-        const loader = createRecordingLoader();
-        messagesContainer.appendChild(loader);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-        alert('🎙️ Voice recording started. Click again to stop.');
-    } catch (err) {
-        alert('⚠️ Microphone access denied or failed.');
-        console.error(err);
-        // Remove loader in case of error
-        const loader = messagesContainer.querySelector('.recording-loader');
-        if (loader) {
-            messagesContainer.removeChild(loader);
-        }
-    }
-});
-
-// Function to display the recorded audio in the chat
-function displayRecordedAudio(audioUrl) {
-    const audioMessage = document.createElement('div');
-    audioMessage.className = 'chat-bubble user-bubble';
-    audioMessage.innerHTML = `
-        <audio controls src="${audioUrl}" style="width: 100%; margin-top: 5px;"></audio>
-        <span class="audio-timestamp">${getCurrentTime()}</span>
-    `;
-    messagesContainer.appendChild(audioMessage);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-// Helper function to get current time in HH:MM AM/PM format
-function getCurrentTime() {
-    const now = new Date();
-    const hours = now.getHours() % 12 || 12;
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
-    return `${hours}:${minutes} ${ampm}`;
-}
-
-// Updated sendVoiceMessage function to include audio display
-function sendVoiceMessage(audioBlob, metadata) {
-    const formData = new FormData();
-    formData.append("file", audioBlob, "voice-message.webm");
-    formData.append("sessionId", conversationId);
-    formData.append("route", settings.webhook.route);
-    formData.append("message_type", "voice");
-    formData.append('metadata[userId]', metadata.userId);
-    formData.append('metadata[userName]', metadata.userName);
-    formData.append('metadata[userEmail]', metadata.userEmail);
-    formData.append('metadata[courseId]', metadata.courseId);
-    formData.append('metadata[lessonId]', metadata.lessonId);
-
-    fetch(settings.webhook.url, {
-        method: 'POST',
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        console.log('✅ Voice message sent:', data);
-        const botMessage = document.createElement('div');
-        botMessage.className = 'chat-bubble bot-bubble';
-        if (data.voice_url) {
-            botMessage.innerHTML = `
-                <p>🎤 Voice reply:</p>
-                <audio controls src="${data.voice_url}" style="width: 100%; margin-top: 5px;"></audio>
-            `;
-        } else {
-            botMessage.textContent = '✅ Voice message uploaded!';
-        }
-        messagesContainer.appendChild(botMessage);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    })
-    .catch(err => {
-        console.error('❌ Upload failed:', err);
-        const botMessage = document.createElement('div');
-        botMessage.className = 'chat-bubble bot-bubble';
-        botMessage.textContent = '⚠️ Voice upload failed.';
-        messagesContainer.appendChild(botMessage);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
     });
-}
 
-// Function to create recording loader
-function createRecordingLoader() {
-    const loader = document.createElement('div');
-    loader.className = 'recording-loader';
-    loader.innerHTML = `
-        <div class="recording-dot"></div>
-        <div class="recording-dot"></div>
-        <div class="recording-dot"></div>
-    `;
-    return loader;
-}
+    // Function to create recording loader
+    function createRecordingLoader() {
+        const loader = document.createElement('div');
+        loader.className = 'recording-loader';
+        loader.innerHTML = `
+            <div class="recording-dot"></div>
+            <div class="recording-dot"></div>
+            <div class="recording-dot"></div>
+        `;
+        return loader;
+    }
+
     // Function to inject ElevenLabs widget
-    function injectElevenLabsWidget(userId, userName, userEmail, lessonId) {
+    function injectElevenLabsWidget(agentId, userId, userName, userEmail, lessonId) {
         if (document.querySelector('elevenlabs-convai')) {
             console.log('✅ ElevenLabs widget already injected');
             return;
@@ -939,7 +871,7 @@ function createRecordingLoader() {
 
         setTimeout(() => {
             const convai = document.createElement("elevenlabs-convai");
-            convai.setAttribute("agent-id", "agent_01jzskys9xf2c9czr2j47tmp5y");
+            convai.setAttribute("agent-id", agentId);
             convai.setAttribute("dynamic-variables", JSON.stringify(dynamicVars));
             document.body.appendChild(convai);
 
@@ -950,21 +882,21 @@ function createRecordingLoader() {
             script.onload = () => console.log('✅ ElevenLabs script loaded');
             script.onerror = () => {
                 console.error('❌ Failed to load ElevenLabs script');
-                alert('⚠️ Failed to load conversational AI widget.');
+                alert('⚠️ Failed to load Pauline.');
             };
             document.body.appendChild(script);
         }, 200);
     }
 
-    // Stream mode button event listener (replaced with ElevenLabs widget)
     streamModeBtn.addEventListener('click', () => {
         const userId = window.ChatWidgetConfig?.user?.id || (emailInput ? emailInput.value.trim() : '');
         const userName = window.ChatWidgetConfig?.user?.name || (nameInput ? nameInput.value.trim() : '');
         const userEmail = window.ChatWidgetConfig?.user?.email || (emailInput ? emailInput.value.trim() : '');
         const lessonId = window.ChatWidgetConfig?.user?.lessonId || '4713';
 
-        injectElevenLabsWidget(userId, userName, userEmail, lessonId);
-        alert('🗣️ Loading ElevenLabs conversational AI widget...');
+        const agentId = "agent_01jzskys9xf2c9czr2j47tmp5y";
+        injectElevenLabsWidget(agentId, userId, userName, userEmail, lessonId);
+        alert('📞 Connecting you to Pauline...');
     });
 
     function sendVoiceMessage(audioBlob, metadata) {
@@ -1023,14 +955,14 @@ function createRecordingLoader() {
         return crypto.randomUUID();
     }
 
-    // Create typing indicator element
+    // Create typing indicator element (used as reply loader)
     function createTypingIndicator() {
         const indicator = document.createElement('div');
-        indicator.className = 'typing-indicator';
+        indicator.className = 'reply-loader';
         indicator.innerHTML = `
-            <div class="typing-dot"></div>
-            <div class="typing-dot"></div>
-            <div class="typing-dot"></div>
+            <div class="reply-dot"></div>
+            <div class="reply-dot"></div>
+            <div class="reply-dot"></div>
         `;
         return indicator;
     }
@@ -1174,7 +1106,7 @@ function createRecordingLoader() {
         } catch (error) {
             console.error('Registration error:', error);
             
-            const indicator = messagesContainer.querySelector('.typing-indicator');
+            const indicator = messagesContainer.querySelector('.reply-loader');
             if (indicator) {
                 messagesContainer.removeChild(indicator);
             }
@@ -1218,8 +1150,8 @@ function createRecordingLoader() {
         userMessage.textContent = messageText;
         messagesContainer.appendChild(userMessage);
         
-        const typingIndicator = createTypingIndicator();
-        messagesContainer.appendChild(typingIndicator);
+        const replyLoader = createTypingIndicator();
+        messagesContainer.appendChild(replyLoader);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
         try {
@@ -1233,7 +1165,7 @@ function createRecordingLoader() {
             
             const responseData = await response.json();
             
-            messagesContainer.removeChild(typingIndicator);
+            messagesContainer.removeChild(replyLoader);
             
             const botMessage = document.createElement('div');
             botMessage.className = 'chat-bubble bot-bubble';
@@ -1244,7 +1176,7 @@ function createRecordingLoader() {
         } catch (error) {
             console.error('Message submission error:', error);
             
-            messagesContainer.removeChild(typingIndicator);
+            messagesContainer.removeChild(replyLoader);
             
             const errorMessage = document.createElement('div');
             errorMessage.className = 'chat-bubble bot-bubble';
