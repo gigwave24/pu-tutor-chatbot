@@ -1161,10 +1161,14 @@
         isWaitingForResponse = true;
         
         const userId = window.ChatWidgetConfig?.user?.id || "";
-        const userName = window.ChatWidgetConfig?.user?.name || (nameInput ? nameInput.value.trim() : '');
-        const userEmail = window.ChatWidgetConfig?.user?.email || (emailInput ? emailInput.value.trim() : '');
-        const courseId = window.ChatWidgetConfig?.user?.courseId || '';
-        const lessonId = window.ChatWidgetConfig?.user?.lessonId || '';
+        const userName = window.ChatWidgetConfig?.user?.name || "";
+        const userEmail = window.ChatWidgetConfig?.user?.email || "";
+        const courseId = window.ChatWidgetConfig?.user?.courseId || "";
+        const lessonId = window.ChatWidgetConfig?.user?.lessonId || "";
+
+        const email = emailInput ? emailInput.value.trim() : userEmail;
+        const name = nameInput ? nameInput.value.trim() : userName;
+
 
         const requestData = {
             action: "sendMessage",
