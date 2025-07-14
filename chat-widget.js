@@ -1022,6 +1022,17 @@
         return emailRegex.test(email);
     }
 
+       // Function to convert URLs in text to clickable links
+    function linkifyText(text) {
+        // URL pattern that matches http, https, ftp links
+        const urlPattern = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+        
+        // Convert URLs to HTML links
+        return text.replace(urlPattern, function(url) {
+            return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="chat-link">${url}</a>`;
+        });
+    }
+
     // Handle registration form submission
     async function handleRegistration(event) {
         event.preventDefault();
