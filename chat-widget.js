@@ -740,8 +740,8 @@
                     <button class="chat-submit" title="Send message">➤</button>
                 </div>
                 <div class="chat-button-area">
-                    <button class="chat-voice-message-btn" title="Start voice chat with Pauline">🎙️</button>
-                    <button class="chat-stream-mode-btn" title="Make a voice call to Pauline">📞</button>
+                    <button class="chat-voice-message-btn" title="Record voice message">🎙️</button>
+                    <button class="chat-stream-mode-btn" title="Start conversational AI">🤖</button>
                 </div>
             </div>
             <div class="chat-footer">
@@ -778,8 +778,7 @@
     let mediaRecorder;
     let recordedChunks = [];
 
-    // Voice message button event listener
-    // Voice message button event listener
+// Voice message button event listener (updated to display recorded audio)
 voiceMessageBtn.addEventListener('click', async () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         alert('🎤 Microphone not supported in this browser.');
@@ -810,6 +809,8 @@ voiceMessageBtn.addEventListener('click', async () => {
 
         mediaRecorder.onstop = () => {
             const audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            displayRecordedAudio(audioUrl); // Display the recorded audio in the chat
             const userId = window.ChatWidgetConfig?.user?.id || (emailInput ? emailInput.value.trim() : '');
             const userName = window.ChatWidgetConfig?.user?.name || (nameInput ? nameInput.value.trim() : '');
             const userEmail = window.ChatWidgetConfig?.user?.email || (emailInput ? emailInput.value.trim() : '');
@@ -845,6 +846,70 @@ voiceMessageBtn.addEventListener('click', async () => {
     }
 });
 
+// Function to display the recorded audio in the chat
+function displayRecordedAudio(audioUrl) {
+    const audioMessage = document.createElement('div');
+    audioMessage.className = 'chat-bubble user-bubble';
+    audioMessage.innerHTML = `
+        <audio controls src="${audioUrl}" style="width: 100%; margin-top: 5px;"></audio>
+        <span class="audio-timestamp">${getCurrentTime()}</span>
+    `;
+    messagesContainer.appendChild(audioMessage);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Helper function to get current time in HH:MM AM/PM format
+function getCurrentTime() {
+    const now = new Date();
+    const hours = now.getHours() % 12 || 12;
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+    return `${hours}:${minutes} ${ampm}`;
+}
+
+// Updated sendVoiceMessage function to include audio display
+function sendVoiceMessage(audioBlob, metadata) {
+    const formData = new FormData();
+    formData.append("file", audioBlob, "voice-message.webm");
+    formData.append("sessionId", conversationId);
+    formData.append("route", settings.webhook.route);
+    formData.append("message_type", "voice");
+    formData.append('metadata[userId]', metadata.userId);
+    formData.append('metadata[userName]', metadata.userName);
+    formData.append('metadata[userEmail]', metadata.userEmail);
+    formData.append('metadata[courseId]', metadata.courseId);
+    formData.append('metadata[lessonId]', metadata.lessonId);
+
+    fetch(settings.webhook.url, {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log('✅ Voice message sent:', data);
+        const botMessage = document.createElement('div');
+        botMessage.className = 'chat-bubble bot-bubble';
+        if (data.voice_url) {
+            botMessage.innerHTML = `
+                <p>🎤 Voice reply:</p>
+                <audio controls src="${data.voice_url}" style="width: 100%; margin-top: 5px;"></audio>
+            `;
+        } else {
+            botMessage.textContent = '✅ Voice message uploaded!';
+        }
+        messagesContainer.appendChild(botMessage);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    })
+    .catch(err => {
+        console.error('❌ Upload failed:', err);
+        const botMessage = document.createElement('div');
+        botMessage.className = 'chat-bubble bot-bubble';
+        botMessage.textContent = '⚠️ Voice upload failed.';
+        messagesContainer.appendChild(botMessage);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    });
+}
+
 // Function to create recording loader
 function createRecordingLoader() {
     const loader = document.createElement('div');
@@ -856,54 +921,51 @@ function createRecordingLoader() {
     `;
     return loader;
 }
+    // Function to inject ElevenLabs widget
+    function injectElevenLabsWidget(userId, userName, userEmail, lessonId) {
+        if (document.querySelector('elevenlabs-convai')) {
+            console.log('✅ ElevenLabs widget already injected');
+            return;
+        }
 
-    // Function to inject ElevenLabs widget (agentId now passed in)
-function injectElevenLabsWidget(agentId, userId, userName, userEmail, lessonId) {
-    if (document.querySelector('elevenlabs-convai')) {
-        console.log('✅ ElevenLabs widget already injected');
-        return;
+        const dynamicVars = {
+            user_id: userId || "1",
+            user_name: userName || "Guest",
+            user_email: userEmail || "guest@example.com",
+            lesson_id: lessonId || "4713"
+        };
+
+        console.log("✅ elevenlabsUserVars injected:", dynamicVars);
+
+        setTimeout(() => {
+            const convai = document.createElement("elevenlabs-convai");
+            convai.setAttribute("agent-id", "agent_01jzskys9xf2c9czr2j47tmp5y");
+            convai.setAttribute("dynamic-variables", JSON.stringify(dynamicVars));
+            document.body.appendChild(convai);
+
+            const script = document.createElement("script");
+            script.src = "https://unpkg.com/@elevenlabs/convai-widget-embed";
+            script.async = true;
+            script.type = "text/javascript";
+            script.onload = () => console.log('✅ ElevenLabs script loaded');
+            script.onerror = () => {
+                console.error('❌ Failed to load ElevenLabs script');
+                alert('⚠️ Failed to load conversational AI widget.');
+            };
+            document.body.appendChild(script);
+        }, 200);
     }
 
-    const dynamicVars = {
-        user_id: userId || "1",
-        user_name: userName || "Guest",
-        user_email: userEmail || "guest@example.com",
-        lesson_id: lessonId || "4713"
-    };
-
-    console.log("✅ elevenlabsUserVars injected:", dynamicVars);
-
-    setTimeout(() => {
-        const convai = document.createElement("elevenlabs-convai");
-        convai.setAttribute("agent-id", agentId); // passed in now
-        convai.setAttribute("dynamic-variables", JSON.stringify(dynamicVars));
-        document.body.appendChild(convai);
-
-        const script = document.createElement("script");
-        script.src = "https://unpkg.com/@elevenlabs/convai-widget-embed";
-        script.async = true;
-        script.type = "text/javascript";
-        script.onload = () => console.log('✅ ElevenLabs script loaded');
-        script.onerror = () => {
-            console.error('❌ Failed to load ElevenLabs script');
-            alert('⚠️ Failed to load Pauline.');
-        };
-        document.body.appendChild(script);
-    }, 200);
-}
-
+    // Stream mode button event listener (replaced with ElevenLabs widget)
     streamModeBtn.addEventListener('click', () => {
-    const userId = window.ChatWidgetConfig?.user?.id || (emailInput ? emailInput.value.trim() : '');
-    const userName = window.ChatWidgetConfig?.user?.name || (nameInput ? nameInput.value.trim() : '');
-    const userEmail = window.ChatWidgetConfig?.user?.email || (emailInput ? emailInput.value.trim() : '');
-    const lessonId = window.ChatWidgetConfig?.user?.lessonId || '4713';
+        const userId = window.ChatWidgetConfig?.user?.id || (emailInput ? emailInput.value.trim() : '');
+        const userName = window.ChatWidgetConfig?.user?.name || (nameInput ? nameInput.value.trim() : '');
+        const userEmail = window.ChatWidgetConfig?.user?.email || (emailInput ? emailInput.value.trim() : '');
+        const lessonId = window.ChatWidgetConfig?.user?.lessonId || '4713';
 
-    const agentId = window.ChatWidgetConfig?.agentId;
-    if (!agentId) return alert('Missing Pauline agent ID');
-
-    injectElevenLabsWidget(agentId, userId, userName, userEmail, lessonId);
-    alert('📞 Connecting you to Pauline...');
-});
+        injectElevenLabsWidget(userId, userName, userEmail, lessonId);
+        alert('🗣️ Loading ElevenLabs conversational AI widget...');
+    });
 
     function sendVoiceMessage(audioBlob, metadata) {
         const formData = new FormData();
