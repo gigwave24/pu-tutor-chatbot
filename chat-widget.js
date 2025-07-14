@@ -231,19 +231,19 @@
             align-items: center;
             gap: 4px;
             padding: 14px 18px;
-            background: linear-gradient(135deg, var(--chat-color-primary) 0%, var(--chat-color-secondary) 100%);
+            background: white;
             border-radius: var(--chat-radius-md);
             border-bottom-right-radius: 4px;
             max-width: 80px;
             align-self: flex-end;
             box-shadow: var(--chat-shadow-sm);
-            color: white;
+            border: 1px solid var(--chat-color-light);
         }
 
         .chat-assist-widget .recording-dot {
             width: 8px;
             height: 8px;
-            background: white;
+            background: var(--chat-color-primary);
             border-radius: var(--chat-radius-full);
             opacity: 0.7;
             animation: recordingAnimation 1.4s infinite ease-in-out;
@@ -740,8 +740,8 @@
                     <button class="chat-submit" title="Send message">➤</button>
                 </div>
                 <div class="chat-button-area">
-                    <button class="chat-voice-message-btn" title="Start voice chat with Pauline">🎙️</button>
-                    <button class="chat-stream-mode-btn" title="Make a voice call to Pauline">📞</button>
+                    <button class="chat-voice-message-btn" title="Record voice message">🎙️</button>
+                    <button class="chat-stream-mode-btn" title="Start conversational AI">🤖</button>
                 </div>
             </div>
             <div class="chat-footer">
@@ -778,7 +778,7 @@
     let mediaRecorder;
     let recordedChunks = [];
 
-    // Voice message button event listener
+    // Voice message button event listener (updated to display recorded audio)
     voiceMessageBtn.addEventListener('click', async () => {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             alert('🎤 Microphone not supported in this browser.');
@@ -789,6 +789,7 @@
             if (mediaRecorder && mediaRecorder.state === 'recording') {
                 mediaRecorder.stop();
                 voiceMessageBtn.innerHTML = '🎙️';
+                // Remove loader when recording stops
                 const loader = messagesContainer.querySelector('.recording-loader');
                 if (loader) {
                     messagesContainer.removeChild(loader);
@@ -808,6 +809,8 @@
 
             mediaRecorder.onstop = () => {
                 const audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                displayRecordedAudio(audioUrl); // Display the recorded audio in the chat
                 const userId = window.ChatWidgetConfig?.user?.id || (emailInput ? emailInput.value.trim() : '');
                 const userName = window.ChatWidgetConfig?.user?.name || (nameInput ? nameInput.value.trim() : '');
                 const userEmail = window.ChatWidgetConfig?.user?.email || (emailInput ? emailInput.value.trim() : '');
@@ -826,6 +829,7 @@
             mediaRecorder.start();
             voiceMessageBtn.innerHTML = '⏹️';
 
+            // Add recording loader
             const loader = createRecordingLoader();
             messagesContainer.appendChild(loader);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -834,12 +838,90 @@
         } catch (err) {
             alert('⚠️ Microphone access denied or failed.');
             console.error(err);
+            // Remove loader in case of error
             const loader = messagesContainer.querySelector('.recording-loader');
             if (loader) {
                 messagesContainer.removeChild(loader);
             }
         }
     });
+
+    // Function to display the recorded audio in the chat
+    function displayRecordedAudio(audioUrl) {
+        const audioMessage = document.createElement('div');
+        audioMessage.className = 'chat-bubble user-bubble';
+        audioMessage.innerHTML = `
+            <audio controls src="${audioUrl}" style="width: 100%; margin-top: 5px;"></audio>
+            <span class="audio-timestamp">${getCurrentTime()}</span>
+        `;
+        messagesContainer.appendChild(audioMessage);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // Helper function to get current time in HH:MM AM/PM format
+    function getCurrentTime() {
+        const now = new Date();
+        const hours = now.getHours() % 12 || 12;
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+        return `${hours}:${minutes} ${ampm}`;
+    }
+
+    // Updated sendVoiceMessage function to include reply loader
+    function sendVoiceMessage(audioBlob, metadata) {
+        const formData = new FormData();
+        formData.append("file", audioBlob, "voice-message.webm");
+        formData.append("sessionId", conversationId);
+        formData.append("route", settings.webhook.route);
+        formData.append("message_type", "voice");
+        formData.append('metadata[userId]', metadata.userId);
+        formData.append('metadata[userName]', metadata.userName);
+        formData.append('metadata[userEmail]', metadata.userEmail);
+        formData.append('metadata[courseId]', metadata.courseId);
+        formData.append('metadata[lessonId]', metadata.lessonId);
+
+        // Add reply loader before sending
+        const replyLoader = createTypingIndicator();
+        messagesContainer.appendChild(replyLoader);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        fetch(settings.webhook.url, {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            // Remove reply loader after response
+            if (messagesContainer.contains(replyLoader)) {
+                messagesContainer.removeChild(replyLoader);
+            }
+            console.log('✅ Voice message sent:', data);
+            const botMessage = document.createElement('div');
+            botMessage.className = 'chat-bubble bot-bubble';
+            if (data.voice_url) {
+                botMessage.innerHTML = `
+                    <p>🎤 Voice reply:</p>
+                    <audio controls src="${data.voice_url}" style="width: 100%; margin-top: 5px;"></audio>
+                `;
+            } else {
+                botMessage.textContent = '✅ Voice message uploaded!';
+            }
+            messagesContainer.appendChild(botMessage);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        })
+        .catch(err => {
+            // Remove reply loader on error
+            if (messagesContainer.contains(replyLoader)) {
+                messagesContainer.removeChild(replyLoader);
+            }
+            console.error('❌ Upload failed:', err);
+            const botMessage = document.createElement('div');
+            botMessage.className = 'chat-bubble bot-bubble';
+            botMessage.textContent = '⚠️ Voice upload failed.';
+            messagesContainer.appendChild(botMessage);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        });
+    }
 
     // Function to create recording loader
     function createRecordingLoader() {
@@ -853,8 +935,20 @@
         return loader;
     }
 
+    // Function to create reply loader
+    function createTypingIndicator() {
+        const indicator = document.createElement('div');
+        indicator.className = 'reply-loader';
+        indicator.innerHTML = `
+            <div class="reply-dot"></div>
+            <div class="reply-dot"></div>
+            <div class="reply-dot"></div>
+        `;
+        return indicator;
+    }
+
     // Function to inject ElevenLabs widget
-    function injectElevenLabsWidget(agentId, userId, userName, userEmail, lessonId) {
+    function injectElevenLabsWidget(userId, userName, userEmail, lessonId) {
         if (document.querySelector('elevenlabs-convai')) {
             console.log('✅ ElevenLabs widget already injected');
             return;
@@ -871,7 +965,7 @@
 
         setTimeout(() => {
             const convai = document.createElement("elevenlabs-convai");
-            convai.setAttribute("agent-id", agentId);
+            convai.setAttribute("agent-id", "agent_01jzskys9xf2c9czr2j47tmp5y");
             convai.setAttribute("dynamic-variables", JSON.stringify(dynamicVars));
             document.body.appendChild(convai);
 
@@ -882,64 +976,22 @@
             script.onload = () => console.log('✅ ElevenLabs script loaded');
             script.onerror = () => {
                 console.error('❌ Failed to load ElevenLabs script');
-                alert('⚠️ Failed to load Pauline.');
+                alert('⚠️ Failed to load conversational AI widget.');
             };
             document.body.appendChild(script);
         }, 200);
     }
 
+    // Stream mode button event listener (replaced with ElevenLabs widget)
     streamModeBtn.addEventListener('click', () => {
         const userId = window.ChatWidgetConfig?.user?.id || (emailInput ? emailInput.value.trim() : '');
         const userName = window.ChatWidgetConfig?.user?.name || (nameInput ? nameInput.value.trim() : '');
         const userEmail = window.ChatWidgetConfig?.user?.email || (emailInput ? emailInput.value.trim() : '');
         const lessonId = window.ChatWidgetConfig?.user?.lessonId || '4713';
 
-        const agentId = "agent_01jzskys9xf2c9czr2j47tmp5y";
-        injectElevenLabsWidget(agentId, userId, userName, userEmail, lessonId);
-        alert('📞 Connecting you to Pauline...');
+        injectElevenLabsWidget(userId, userName, userEmail, lessonId);
+        alert('🗣️ Loading ElevenLabs conversational AI widget...');
     });
-
-    function sendVoiceMessage(audioBlob, metadata) {
-        const formData = new FormData();
-        formData.append("file", audioBlob, "voice-message.webm");
-        formData.append("sessionId", conversationId);
-        formData.append("route", settings.webhook.route);
-        formData.append("message_type", "voice");
-        formData.append('metadata[userId]', metadata.userId);
-        formData.append('metadata[userName]', metadata.userName);
-        formData.append('metadata[userEmail]', metadata.userEmail);
-        formData.append('metadata[courseId]', metadata.courseId);
-        formData.append('metadata[lessonId]', metadata.lessonId);
-
-        fetch(settings.webhook.url, {
-            method: 'POST',
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            console.log('✅ Voice message sent:', data);
-            const botMessage = document.createElement('div');
-            botMessage.className = 'chat-bubble bot-bubble';
-            if (data.voice_url) {
-                botMessage.innerHTML = `
-                    <p>🎤 Voice reply:</p>
-                    <audio controls src="${data.voice_url}" style="width: 100%; margin-top: 5px;"></audio>
-                `;
-            } else {
-                botMessage.textContent = '✅ Voice message uploaded!';
-            }
-            messagesContainer.appendChild(botMessage);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        })
-        .catch(err => {
-            console.error('❌ Upload failed:', err);
-            const botMessage = document.createElement('div');
-            botMessage.className = 'chat-bubble bot-bubble';
-            botMessage.textContent = '⚠️ Voice upload failed.';
-            messagesContainer.appendChild(botMessage);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        });
-    }
 
     // Registration form elements
     const registrationForm = chatWindow.querySelector('.registration-form');
@@ -953,26 +1005,6 @@
     // Helper function to generate unique session ID
     function createSessionId() {
         return crypto.randomUUID();
-    }
-
-    // Create typing indicator element (used as reply loader)
-    function createTypingIndicator() {
-        const indicator = document.createElement('div');
-        indicator.className = 'reply-loader';
-        indicator.innerHTML = `
-            <div class="reply-dot"></div>
-            <div class="reply-dot"></div>
-            <div class="reply-dot"></div>
-        `;
-        return indicator;
-    }
-
-    // Function to convert URLs in text to clickable links
-    function linkifyText(text) {
-        const urlPattern = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
-        return text.replace(urlPattern, function(url) {
-            return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="chat-link">${url}</a>`;
-        });
     }
 
     // Show registration form
@@ -1035,8 +1067,8 @@
             userRegistration.classList.remove('active');
             chatBody.classList.add('active');
             
-            const typingIndicator = createTypingIndicator();
-            messagesContainer.appendChild(typingIndicator);
+            const replyLoader = createTypingIndicator();
+            messagesContainer.appendChild(replyLoader);
             
             const sessionResponse = await fetch(settings.webhook.url, {
                 method: 'POST',
@@ -1073,7 +1105,7 @@
             
             const userInfoResponseData = await userInfoResponse.json();
             
-            messagesContainer.removeChild(typingIndicator);
+            messagesContainer.removeChild(replyLoader);
             
             const botMessage = document.createElement('div');
             botMessage.className = 'chat-bubble bot-bubble';
