@@ -588,6 +588,50 @@
         .chat-assist-widget .chat-stream-mode-btn:hover {
             background: var(--chat-color-light);
         }
+
+        .chat-assist-widget .recording-loader {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 18px;
+    background: white;
+    border-radius: var(--chat-radius-md);
+    border-bottom-left-radius: 4px;
+    max-width: 80px;
+    align-self: flex-start;
+    box-shadow: var(--chat-shadow-sm);
+    border: 1px solid var(--chat-color-light);
+}
+
+.chat-assist-widget .recording-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--chat-color-primary);
+    border-radius: var(--chat-radius-full);
+    opacity: 0.7;
+    animation: recordingAnimation 1.4s infinite ease-in-out;
+}
+
+.chat-assist-widget .recording-dot:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.chat-assist-widget .recording-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.chat-assist-widget .recording-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes recordingAnimation {
+    0%, 60%, 100% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-4px);
+    }
+}
     `;
     document.head.appendChild(widgetStyles);
 
@@ -735,54 +779,83 @@
     let recordedChunks = [];
 
     // Voice message button event listener
-    voiceMessageBtn.addEventListener('click', async () => {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            alert('🎤 Microphone not supported in this browser.');
+    // Voice message button event listener
+voiceMessageBtn.addEventListener('click', async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert('🎤 Microphone not supported in this browser.');
+        return;
+    }
+
+    try {
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            voiceMessageBtn.innerHTML = '🎙️';
+            // Remove loader when recording stops
+            const loader = messagesContainer.querySelector('.recording-loader');
+            if (loader) {
+                messagesContainer.removeChild(loader);
+            }
+            alert('🎙️ Recording stopped.');
             return;
         }
 
-        try {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-                voiceMessageBtn.innerHTML = '🎙️';
-                alert('🎙️ Recording stopped.');
-                return;
-            }
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        recordedChunks = [];
 
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            recordedChunks = [];
+        mediaRecorder = new MediaRecorder(stream);
 
-            mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) recordedChunks.push(e.data);
+        };
 
-            mediaRecorder.ondataavailable = (e) => {
-                if (e.data.size > 0) recordedChunks.push(e.data);
-            };
+        mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
+            const userId = window.ChatWidgetConfig?.user?.id || (emailInput ? emailInput.value.trim() : '');
+            const userName = window.ChatWidgetConfig?.user?.name || (nameInput ? nameInput.value.trim() : '');
+            const userEmail = window.ChatWidgetConfig?.user?.email || (emailInput ? emailInput.value.trim() : '');
+            const courseId = window.ChatWidgetConfig?.user?.courseId || '';
+            const lessonId = window.ChatWidgetConfig?.user?.lessonId || '';
+            sendVoiceMessage(audioBlob, {
+                userId,
+                userName,
+                userEmail,
+                courseId,
+                lessonId
+            });
+            stream.getTracks().forEach(track => track.stop());
+        };
 
-            mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
-                const userId = window.ChatWidgetConfig?.user?.id || (emailInput ? emailInput.value.trim() : '');
-                const userName = window.ChatWidgetConfig?.user?.name || (nameInput ? nameInput.value.trim() : '');
-                const userEmail = window.ChatWidgetConfig?.user?.email || (emailInput ? emailInput.value.trim() : '');
-                const courseId = window.ChatWidgetConfig?.user?.courseId || '';
-                const lessonId = window.ChatWidgetConfig?.user?.lessonId || '';
-                sendVoiceMessage(audioBlob, {
-                    userId,
-                    userName,
-                    userEmail,
-                    courseId,
-                    lessonId
-                });
-                stream.getTracks().forEach(track => track.stop());
-            };
+        mediaRecorder.start();
+        voiceMessageBtn.innerHTML = '⏹️';
 
-            mediaRecorder.start();
-            voiceMessageBtn.innerHTML = '⏹️';
-            alert('🎙️ Voice recording started. Click again to stop.');
-        } catch (err) {
-            alert('⚠️ Microphone access denied or failed.');
-            console.error(err);
+        // Add recording loader
+        const loader = createRecordingLoader();
+        messagesContainer.appendChild(loader);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        alert('🎙️ Voice recording started. Click again to stop.');
+    } catch (err) {
+        alert('⚠️ Microphone access denied or failed.');
+        console.error(err);
+        // Remove loader in case of error
+        const loader = messagesContainer.querySelector('.recording-loader');
+        if (loader) {
+            messagesContainer.removeChild(loader);
         }
-    });
+    }
+});
+
+// Function to create recording loader
+function createRecordingLoader() {
+    const loader = document.createElement('div');
+    loader.className = 'recording-loader';
+    loader.innerHTML = `
+        <div class="recording-dot"></div>
+        <div class="recording-dot"></div>
+        <div class="recording-dot"></div>
+    `;
+    return loader;
+}
 
     // Function to inject ElevenLabs widget (agentId now passed in)
 function injectElevenLabsWidget(agentId, userId, userName, userEmail, lessonId) {
