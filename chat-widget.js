@@ -740,8 +740,8 @@
                     <button class="chat-submit" title="Send message">➤</button>
                 </div>
                 <div class="chat-button-area">
-                    <button class="chat-voice-message-btn" title="Record voice message">🎙️</button>
-                    <button class="chat-stream-mode-btn" title="Start conversational AI">🤖</button>
+                    <button class="chat-voice-message-btn" title="Start voice chat with Pauline">🎙️</button>
+                    <button class="chat-stream-mode-btn" title="Make a voice call to Pauline">📞</button>
                 </div>
             </div>
             <div class="chat-footer">
@@ -976,7 +976,7 @@
             script.onload = () => console.log('✅ ElevenLabs script loaded');
             script.onerror = () => {
                 console.error('❌ Failed to load ElevenLabs script');
-                alert('⚠️ Failed to load conversational AI widget.');
+                alert('⚠️ Failed to load Pauline.');
             };
             document.body.appendChild(script);
         }, 200);
@@ -993,7 +993,7 @@
         if (!agentId) return alert('Missing Pauline agent ID');
 
         injectElevenLabsWidget(agentId,userId, userName, userEmail, lessonId);
-        alert('🗣️ Loading ElevenLabs conversational AI widget...');
+        alert('📞 Connecting you to Pauline...');
     });
 
     // Registration form elements
