@@ -740,7 +740,7 @@
                     <button class="chat-submit" title="Send message">➤</button>
                 </div>
                 <div class="chat-button-area">
-                    <button class="chat-voice-message-btn" title="Start voice chat with Pauline">🎙️</button>
+                    <!--<button class="chat-voice-message-btn" title="Start voice chat with Pauline">🎙️</button>-->
                     <button class="chat-stream-mode-btn" title="Make a voice call to Pauline">📞</button>
                 </div>
             </div>
@@ -772,14 +772,14 @@
     const messagesContainer = chatWindow.querySelector('.chat-messages');
     const messageTextarea = chatWindow.querySelector('.chat-textarea');
     const sendButton = chatWindow.querySelector('.chat-submit');
-    const voiceMessageBtn = chatWindow.querySelector('.chat-voice-message-btn');
+    //const voiceMessageBtn = chatWindow.querySelector('.chat-voice-message-btn');
     const streamModeBtn = chatWindow.querySelector('.chat-stream-mode-btn');
 
     let mediaRecorder;
     let recordedChunks = [];
 
     // Voice message button event listener (updated to display recorded audio)
-    voiceMessageBtn.addEventListener('click', async () => {
+    /*voiceMessageBtn.addEventListener('click', async () => {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             alert('🎤 Microphone not supported in this browser.');
             return;
@@ -844,7 +844,7 @@
                 messagesContainer.removeChild(loader);
             }
         }
-    });
+    });*/
 
     // Function to display the recorded audio in the chat
     function displayRecordedAudio(audioUrl) {
@@ -868,7 +868,7 @@
     }
 
     // Updated sendVoiceMessage function to include reply loader
-    function sendVoiceMessage(audioBlob, metadata) {
+    /*function sendVoiceMessage(audioBlob, metadata) {
         const formData = new FormData();
         formData.append("file", audioBlob, "voice-message.webm");
         formData.append("sessionId", conversationId);
@@ -921,7 +921,7 @@
             messagesContainer.appendChild(botMessage);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         });
-    }
+    }*/
 
     // Function to create recording loader
     function createRecordingLoader() {
