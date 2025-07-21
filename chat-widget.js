@@ -52,7 +52,7 @@
         }
 
         .chat-assist-widget .chat-window.right-side {
-            right: 20px;
+            right: 98px;
         }
 
         .chat-assist-widget .chat-window.left-side {
