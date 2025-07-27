@@ -52,7 +52,7 @@
         }
 
         .chat-assist-widget .chat-window.right-side {
-            right: 98px;
+            right: 18px;
         }
 
         .chat-assist-widget .chat-window.left-side {
@@ -64,6 +64,94 @@
             opacity: 1;
             transform: translateY(0) scale(1);
         }
+
+        /* Mobile-specific styles */
+    @media (max-width: 768px) {
+        .chat-assist-widget .chat-window {
+            width: 80vw; /* Use 90% of viewport width for flexibility */
+            max-width: 340px; /* Cap the width for larger phones */
+            height: 60vh; /* Use 70% of viewport height */
+            max-height: 500px; /* Cap the height */
+            bottom: 70px; /* Reduce bottom offset for better fit */
+        }
+
+        .chat-assist-widget .chat-window.right-side {
+            right: 10px; /* Adjust for smaller screens */
+        }
+
+        .chat-assist-widget .chat-window.left-side {
+            left: 10px; /* Adjust for smaller screens */
+        }
+
+        .chat-assist-widget .chat-header {
+            padding: 12px; /* Reduce padding */
+        }
+
+        .chat-assist-widget .chat-header-title {
+            font-size: 14px; /* Smaller font size */
+        }
+
+        .chat-assist-widget .chat-welcome-title {
+            font-size: 18px; /* Smaller welcome title */
+            margin-bottom: 16px;
+        }
+
+        .chat-assist-widget .chat-start-btn {
+            padding: 12px 16px; /* Smaller button padding */
+            font-size: 14px; /* Smaller font size */
+        }
+
+        .chat-assist-widget .chat-messages {
+            padding: 16px; /* Reduce padding */
+        }
+
+        .chat-assist-widget .chat-bubble {
+            font-size: 13px; /* Smaller text in chat bubbles */
+            padding: 12px 14px; /* Smaller padding */
+        }
+
+        .chat-assist-widget .chat-textarea {
+            font-size: 13px; /* Smaller textarea font */
+            padding: 12px 14px; /* Adjust padding */
+        }
+
+        .chat-assist-widget .chat-button-area button,
+        .chat-assist-widget .chat-submit {
+            width: 40px; /* Smaller buttons */
+            height: 40px;
+            font-size: 16px; /* Smaller icons */
+        }
+
+        .chat-assist-widget .chat-launcher {
+            height: 48px; /* Smaller launcher button */
+            padding: 0 16px 0 12px;
+        }
+
+        .chat-assist-widget .chat-launcher-text {
+            font-size: 14px; /* Smaller text */
+        }
+
+        .chat-assist-widget .registration-title {
+            font-size: 16px; /* Smaller registration title */
+        }
+
+        .chat-assist-widget .form-input {
+            padding: 10px 12px; /* Smaller input padding */
+            font-size: 13px; /* Smaller font */
+        }
+
+        .chat-assist-widget .submit-registration {
+            padding: 12px 16px; /* Smaller button padding */
+            font-size: 14px; /* Smaller font */
+        }
+
+        .chat-assist-widget .suggested-question-btn {
+            font-size: 12px; /* Smaller suggested questions */
+            padding: 8px 12px;
+        }
+    }
+
+    /* Rest of your existing styles remain unchanged */
 
         .chat-assist-widget .chat-header {
             padding: 16px;
@@ -431,7 +519,7 @@
         }
 
         .chat-assist-widget .chat-launcher.right-side {
-            right: 20px;
+            right: 98px;
         }
 
         .chat-assist-widget .chat-launcher.left-side {
