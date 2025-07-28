@@ -851,7 +851,7 @@
                 </div>
                 <div class="chat-button-area">
                     <button class="chat-stream-mode-btn" title="Make a voice call to Pauline">📞</button>
-                    <button class="chat-heygen-btn" title="Talk to Avatar">🤖</button>
+                    <button class="chat-heygen-btn" title="Interact with Logan, your AI Tutor">👨‍💼</button>
                 </div>
             </div>
             <div class="chat-footer">
@@ -957,7 +957,7 @@
     // HeyGen button event listener
     heygenButton.addEventListener('click', () => {
         injectHeyGenWidget();
-        alert('🤖 Connecting to HeyGen avatar...');
+        alert('📞 Connecting you to Logan...');
     });
 
     // Function to display the recorded audio in the chat
