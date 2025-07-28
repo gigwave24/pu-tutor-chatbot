@@ -1,4 +1,3 @@
-// v1.0.3 update - replaced streamModeBtn with ElevenLabs widget integration
 (function() {
     // Initialize widget only once
     if (window.N8nChatWidgetLoaded) return;
@@ -66,92 +65,90 @@
         }
 
         /* Mobile-specific styles */
-    @media (max-width: 768px) {
-        .chat-assist-widget .chat-window {
-            width: 80vw; /* Use 90% of viewport width for flexibility */
-            max-width: 340px; /* Cap the width for larger phones */
-            height: 60vh; /* Use 70% of viewport height */
-            max-height: 500px; /* Cap the height */
-            bottom: 70px; /* Reduce bottom offset for better fit */
-        }
+        @media (max-width: 768px) {
+            .chat-assist-widget .chat-window {
+                width: 80vw; /* Use 90% of viewport width for flexibility */
+                max-width: 340px; /* Cap the width for larger phones */
+                height: 60vh; /* Use 70% of viewport height */
+                max-height: 500px; /* Cap the height */
+                bottom: 70px; /* Reduce bottom offset for better fit */
+            }
 
-        .chat-assist-widget .chat-window.right-side {
-            right: 10px; /* Adjust for smaller screens */
-        }
+            .chat-assist-widget .chat-window.right-side {
+                right: 10px; /* Adjust for smaller screens */
+            }
 
-        .chat-assist-widget .chat-window.left-side {
-            left: 10px; /* Adjust for smaller screens */
-        }
+            .chat-assist-widget .chat-window.left-side {
+                left: 10px; /* Adjust for smaller screens */
+            }
 
-        .chat-assist-widget .chat-header {
-            padding: 12px; /* Reduce padding */
-        }
+            .chat-assist-widget .chat-header {
+                padding: 12px; /* Reduce padding */
+            }
 
-        .chat-assist-widget .chat-header-title {
-            font-size: 14px; /* Smaller font size */
-        }
+            .chat-assist-widget .chat-header-title {
+                font-size: 14px; /* Smaller font size */
+            }
 
-        .chat-assist-widget .chat-welcome-title {
-            font-size: 18px; /* Smaller welcome title */
-            margin-bottom: 16px;
-        }
+            .chat-assist-widget .chat-welcome-title {
+                font-size: 18px; /* Smaller welcome title */
+                margin-bottom: 16px;
+            }
 
-        .chat-assist-widget .chat-start-btn {
-            padding: 12px 16px; /* Smaller button padding */
-            font-size: 14px; /* Smaller font size */
-        }
+            .chat-assist-widget .chat-start-btn {
+                padding: 12px 16px; /* Smaller button padding */
+                font-size: 14px; /* Smaller font size */
+            }
 
-        .chat-assist-widget .chat-messages {
-            padding: 16px; /* Reduce padding */
-        }
+            .chat-assist-widget .chat-messages {
+                padding: 16px; /* Reduce padding */
+            }
 
-        .chat-assist-widget .chat-bubble {
-            font-size: 13px; /* Smaller text in chat bubbles */
-            padding: 12px 14px; /* Smaller padding */
-        }
+            .chat-assist-widget .chat-bubble {
+                font-size: 13px; /* Smaller text in chat bubbles */
+                padding: 12px 14px; /* Smaller padding */
+            }
 
-        .chat-assist-widget .chat-textarea {
-            font-size: 13px; /* Smaller textarea font */
-            padding: 12px 14px; /* Adjust padding */
-        }
+            .chat-assist-widget .chat-textarea {
+                font-size: 13px; /* Smaller textarea font */
+                padding: 12px 14px; /* Adjust padding */
+            }
 
-        .chat-assist-widget .chat-button-area button,
-        .chat-assist-widget .chat-submit {
-            width: 40px; /* Smaller buttons */
-            height: 40px;
-            font-size: 16px; /* Smaller icons */
-        }
+            .chat-assist-widget .chat-button-area button,
+            .chat-assist-widget .chat-submit {
+                width: 40px; /* Smaller buttons */
+                height: 40px;
+                font-size: 16px; /* Smaller icons */
+            }
 
-        .chat-assist-widget .chat-launcher {
-            height: 48px; /* Smaller launcher button */
-            padding: 0 16px 0 12px;
-        }
+            .chat-assist-widget .chat-launcher {
+                height: 48px; /* Smaller launcher button */
+                padding: 0 16px 0 12px;
+            }
 
-        .chat-assist-widget .chat-launcher-text {
-            font-size: 14px; /* Smaller text */
-        }
+            .chat-assist-widget .chat-launcher-text {
+                font-size: 14px; /* Smaller text */
+            }
 
-        .chat-assist-widget .registration-title {
-            font-size: 16px; /* Smaller registration title */
-        }
+            .chat-assist-widget .registration-title {
+                font-size: 16px; /* Smaller registration title */
+            }
 
-        .chat-assist-widget .form-input {
-            padding: 10px 12px; /* Smaller input padding */
-            font-size: 13px; /* Smaller font */
-        }
+            .chat-assist-widget .form-input {
+                padding: 10px 12px; /* Smaller input padding */
+                font-size: 13px; /* Smaller font */
+            }
 
-        .chat-assist-widget .submit-registration {
-            padding: 12px 16px; /* Smaller button padding */
-            font-size: 14px; /* Smaller font */
-        }
+            .chat-assist-widget .submit-registration {
+                padding: 12px 16px; /* Smaller button padding */
+                font-size: 14px; /* Smaller font */
+            }
 
-        .chat-assist-widget .suggested-question-btn {
-            font-size: 12px; /* Smaller suggested questions */
-            padding: 8px 12px;
+            .chat-assist-widget .suggested-question-btn {
+                font-size: 12px; /* Smaller suggested questions */
+                padding: 8px 12px;
+            }
         }
-    }
-
-    /* Rest of your existing styles remain unchanged */
 
         .chat-assist-widget .chat-header {
             padding: 16px;
@@ -455,25 +452,6 @@
             justify-content: space-between;
         }
 
-        .chat-assist-widget .chat-button-area button {
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            border: none;
-            border-radius: var(--chat-radius-md);
-            background: #f3f4f6;
-            color: var(--chat-color-text);
-            cursor: pointer;
-            transition: var(--chat-transition);
-        }
-
-        .chat-assist-widget .chat-button-area button:hover {
-            background: var(--chat-color-light);
-        }
-
         .chat-assist-widget .chat-submit {
             background: linear-gradient(135deg, var(--chat-color-primary), var(--chat-color-secondary));
             color: white;
@@ -701,7 +679,8 @@
         }
 
         .chat-assist-widget .chat-voice-message-btn,
-        .chat-assist-widget .chat-stream-mode-btn {
+        .chat-assist-widget .chat-stream-mode-btn,
+        .chat-assist-widget .chat-heygen-btn {
             width: 48px;
             height: 48px;
             border-radius: var(--chat-radius-md);
@@ -717,8 +696,51 @@
         }
 
         .chat-assist-widget .chat-voice-message-btn:hover,
-        .chat-assist-widget .chat-stream-mode-btn:hover {
+        .chat-assist-widget .chat-stream-mode-btn:hover,
+        .chat-assist-widget .chat-heygen-btn:hover {
             background: var(--chat-color-light);
+        }
+
+        /* HeyGen widget styles */
+        #heygen-streaming-embed {
+            z-index: 9999;
+            position: fixed;
+            left: 40px;
+            bottom: 40px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.12);
+            transition: all linear 0.1s;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        #heygen-streaming-embed.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #heygen-streaming-embed.expand {
+            height: ${document.body.clientWidth < 540 ? '266px' : '366px'};
+            width: ${document.body.clientWidth < 540 ? '96%' : 'calc(366px * 16 / 9)'};
+            border: 0;
+            border-radius: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #heygen-streaming-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        #heygen-streaming-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
         }
     `;
     document.head.appendChild(widgetStyles);
@@ -828,8 +850,8 @@
                     <button class="chat-submit" title="Send message">➤</button>
                 </div>
                 <div class="chat-button-area">
-                    <!--<button class="chat-voice-message-btn" title="Start voice chat with Pauline">🎙️</button>-->
                     <button class="chat-stream-mode-btn" title="Make a voice call to Pauline">📞</button>
+                    <button class="chat-heygen-btn" title="Talk to Avatar">🤖</button>
                 </div>
             </div>
             <div class="chat-footer">
@@ -860,156 +882,11 @@
     const messagesContainer = chatWindow.querySelector('.chat-messages');
     const messageTextarea = chatWindow.querySelector('.chat-textarea');
     const sendButton = chatWindow.querySelector('.chat-submit');
-    //const voiceMessageBtn = chatWindow.querySelector('.chat-voice-message-btn');
     const streamModeBtn = chatWindow.querySelector('.chat-stream-mode-btn');
+    const heygenButton = chatWindow.querySelector('.chat-heygen-btn');
 
     let mediaRecorder;
     let recordedChunks = [];
-
-    // Voice message button event listener (updated to display recorded audio)
-    /*voiceMessageBtn.addEventListener('click', async () => {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            alert('🎤 Microphone not supported in this browser.');
-            return;
-        }
-
-        try {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-                voiceMessageBtn.innerHTML = '🎙️';
-                // Remove loader when recording stops
-                const loader = messagesContainer.querySelector('.recording-loader');
-                if (loader) {
-                    messagesContainer.removeChild(loader);
-                }
-                alert('🎙️ Recording stopped.');
-                return;
-            }
-
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            recordedChunks = [];
-
-            mediaRecorder = new MediaRecorder(stream);
-
-            mediaRecorder.ondataavailable = (e) => {
-                if (e.data.size > 0) recordedChunks.push(e.data);
-            };
-
-            mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
-                const audioUrl = URL.createObjectURL(audioBlob);
-                displayRecordedAudio(audioUrl); // Display the recorded audio in the chat
-                const userId = window.ChatWidgetConfig?.user?.id || (emailInput ? emailInput.value.trim() : '');
-                const userName = window.ChatWidgetConfig?.user?.name || (nameInput ? nameInput.value.trim() : '');
-                const userEmail = window.ChatWidgetConfig?.user?.email || (emailInput ? emailInput.value.trim() : '');
-                const courseId = window.ChatWidgetConfig?.user?.courseId || '';
-                const lessonId = window.ChatWidgetConfig?.user?.lessonId || '';
-                sendVoiceMessage(audioBlob, {
-                    userId,
-                    userName,
-                    userEmail,
-                    courseId,
-                    lessonId
-                });
-                stream.getTracks().forEach(track => track.stop());
-            };
-
-            mediaRecorder.start();
-            voiceMessageBtn.innerHTML = '⏹️';
-
-            // Add recording loader
-            const loader = createRecordingLoader();
-            messagesContainer.appendChild(loader);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-            alert('🎙️ Voice recording started. Click again to stop.');
-        } catch (err) {
-            alert('⚠️ Microphone access denied or failed.');
-            console.error(err);
-            // Remove loader in case of error
-            const loader = messagesContainer.querySelector('.recording-loader');
-            if (loader) {
-                messagesContainer.removeChild(loader);
-            }
-        }
-    });*/
-
-    // Function to display the recorded audio in the chat
-    function displayRecordedAudio(audioUrl) {
-        const audioMessage = document.createElement('div');
-        audioMessage.className = 'chat-bubble user-bubble';
-        audioMessage.innerHTML = `
-            <audio controls src="${audioUrl}" style="width: 100%; margin-top: 5px;"></audio>
-            <span class="audio-timestamp">${getCurrentTime()}</span>
-        `;
-        messagesContainer.appendChild(audioMessage);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    // Helper function to get current time in HH:MM AM/PM format
-    function getCurrentTime() {
-        const now = new Date();
-        const hours = now.getHours() % 12 || 12;
-        const minutes = now.getMinutes().toString().padStart(2, '0');
-        const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
-        return `${hours}:${minutes} ${ampm}`;
-    }
-
-    // Updated sendVoiceMessage function to include reply loader
-    /*function sendVoiceMessage(audioBlob, metadata) {
-        const formData = new FormData();
-        formData.append("file", audioBlob, "voice-message.webm");
-        formData.append("sessionId", conversationId);
-        formData.append("route", settings.webhook.route);
-        formData.append("message_type", "voice");
-        formData.append('metadata[userId]', metadata.userId);
-        formData.append('metadata[userName]', metadata.userName);
-        formData.append('metadata[userEmail]', metadata.userEmail);
-        formData.append('metadata[courseId]', metadata.courseId);
-        formData.append('metadata[lessonId]', metadata.lessonId);
-
-        // Add reply loader before sending
-        const replyLoader = createTypingIndicator();
-        messagesContainer.appendChild(replyLoader);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-        fetch(settings.webhook.url, {
-            method: 'POST',
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            // Remove reply loader after response
-            if (messagesContainer.contains(replyLoader)) {
-                messagesContainer.removeChild(replyLoader);
-            }
-            console.log('✅ Voice message sent:', data);
-            const botMessage = document.createElement('div');
-            botMessage.className = 'chat-bubble bot-bubble';
-            if (data.voice_url) {
-                botMessage.innerHTML = `
-                    <p>🎤 Voice reply:</p>
-                    <audio controls src="${data.voice_url}" style="width: 100%; margin-top: 5px;"></audio>
-                `;
-            } else {
-                botMessage.textContent = '✅ Voice message uploaded!';
-            }
-            messagesContainer.appendChild(botMessage);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        })
-        .catch(err => {
-            // Remove reply loader on error
-            if (messagesContainer.contains(replyLoader)) {
-                messagesContainer.removeChild(replyLoader);
-            }
-            console.error('❌ Upload failed:', err);
-            const botMessage = document.createElement('div');
-            botMessage.className = 'chat-bubble bot-bubble';
-            botMessage.textContent = '⚠️ Voice upload failed.';
-            messagesContainer.appendChild(botMessage);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        });
-    }*/
 
     // Function to create recording loader
     function createRecordingLoader() {
@@ -1035,8 +912,77 @@
         return indicator;
     }
 
+    // Function to inject HeyGen streaming widget
+    function injectHeyGenWidget() {
+        if (document.querySelector('#heygen-streaming-embed')) {
+            console.log('✅ HeyGen widget already injected');
+            const wrapDiv = document.querySelector('#heygen-streaming-embed');
+            wrapDiv.classList.toggle('show', true);
+            return;
+        }
+
+        const host = "https://labs.heygen.com";
+        const url = `${host}/guest/streaming-embed?share=eyJxdWFsaXR5IjoiaGlnaCIsImF2YXRhck5hbWUiOiJHcmFoYW1fQmxhY2tfU2hpcnRfcHVibGlj%0D%0AIiwicHJldmlld0ltZyI6Imh0dHBzOi8vZmlsZXMyLmhleWdlbi5haS9hdmF0YXIvdjMvMWJkMDE2%0D%0AMmNlOTg1NDE1MDkyZWQxZjAwM2FhOTA2NDZfNTUzNTAvcHJldmlld190YXJnZXQud2VicCIsIm5l%0D%0AZWRSZW1vdmVCYWNrZ3JvdW5kIjp0cnVlLCJrbm93bGVkZ2VCYXNlSWQiOiJmNzA0NDczMjlmNGY0%0D%0AZThhYjkwNDBhMzlkZjU5YTA3MiIsInVzZXJuYW1lIjoiOTNhODVhYzVkNjQ4NGEzOGE2NThlMzE5%0D%0AYTRjMTJjYjIifQ%3D%3D&inIFrame=1`;
+
+        const wrapDiv = document.createElement("div");
+        wrapDiv.id = "heygen-streaming-embed";
+        const container = document.createElement("div");
+        container.id = "heygen-streaming-container";
+        const iframe = document.createElement("iframe");
+        iframe.allowFullscreen = false;
+        iframe.title = "Streaming Embed";
+        iframe.role = "dialog";
+        iframe.allow = "microphone";
+        iframe.src = url;
+
+        container.appendChild(iframe);
+        wrapDiv.appendChild(container);
+        document.body.appendChild(wrapDiv);
+
+        window.addEventListener("message", (e) => {
+            if (e.origin === host && e.data && e.data.type && e.data.type === "streaming-embed") {
+                if (e.data.action === "init") {
+                    wrapDiv.classList.toggle("show", true);
+                } else if (e.data.action === "show") {
+                    wrapDiv.classList.toggle("expand", true);
+                } else if (e.data.action === "hide") {
+                    wrapDiv.classList.toggle("expand", false);
+                }
+            }
+        });
+
+        console.log('✅ HeyGen widget injected');
+    }
+
+    // HeyGen button event listener
+    heygenButton.addEventListener('click', () => {
+        injectHeyGenWidget();
+        alert('🤖 Connecting to HeyGen avatar...');
+    });
+
+    // Function to display the recorded audio in the chat
+    function displayRecordedAudio(audioUrl) {
+        const audioMessage = document.createElement('div');
+        audioMessage.className = 'chat-bubble user-bubble';
+        audioMessage.innerHTML = `
+            <audio controls src="${audioUrl}" style="width: 100%; margin-top: 5px;"></audio>
+            <span class="audio-timestamp">${getCurrentTime()}</span>
+        `;
+        messagesContainer.appendChild(audioMessage);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // Helper function to get current time in HH:MM AM/PM format
+    function getCurrentTime() {
+        const now = new Date();
+        const hours = now.getHours() % 12 || 12;
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+        return `${hours}:${minutes} ${ampm}`;
+    }
+
     // Function to inject ElevenLabs widget
-    function injectElevenLabsWidget(agentid,userId, userName, userEmail, lessonId) {
+    function injectElevenLabsWidget(agentid, userId, userName, userEmail, lessonId) {
         if (document.querySelector('elevenlabs-convai')) {
             console.log('✅ ElevenLabs widget already injected');
             return;
@@ -1080,7 +1026,7 @@
         const agentId = window.ChatWidgetConfig?.agentId;
         if (!agentId) return alert('Missing Pauline agent ID');
 
-        injectElevenLabsWidget(agentId,userId, userName, userEmail, lessonId);
+        injectElevenLabsWidget(agentId, userId, userName, userEmail, lessonId);
         alert('📞 Connecting you to Pauline...');
     });
 
@@ -1110,7 +1056,7 @@
         return emailRegex.test(email);
     }
 
-       // Function to convert URLs in text to clickable links
+    // Function to convert URLs in text to clickable links
     function linkifyText(text) {
         // URL pattern that matches http, https, ftp links
         const urlPattern = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
@@ -1268,7 +1214,6 @@
         const email = emailInput ? emailInput.value.trim() : userEmail;
         const name = nameInput ? nameInput.value.trim() : userName;
 
-
         const requestData = {
             action: "sendMessage",
             sessionId: conversationId,
@@ -1302,20 +1247,17 @@
             });
             
             if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
             let responseData;
             const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) 
-                {
-                    responseData = await response.json();
-                } 
-            else 
-                {
-                    responseData = { output: `Received non-JSON response: ${await response.text()}` };
-                    console.warn('Non-JSON response received:', await response.text());
-                }
+            if (contentType && contentType.includes('application/json')) {
+                responseData = await response.json();
+            } else {
+                responseData = { output: `Received non-JSON response: ${await response.text()}` };
+                console.warn('Non-JSON response received:', await response.text());
+            }
 
             messagesContainer.removeChild(replyLoader);
             
