@@ -589,6 +589,12 @@
             background: var(--chat-color-light);
         }
 
+           
+   /* Hide AI Tutor button */
+   .chat-assist-widget .chat-heygen-btn {
+       display: none !important;
+   }
+
         .chat-assist-widget .recording-loader {
     display: flex;
     align-items: center;
@@ -1249,3 +1255,4 @@ function injectElevenLabsWidget(agentId, userId, userName, userEmail, lessonId) 
         });
     });
 })();
+
